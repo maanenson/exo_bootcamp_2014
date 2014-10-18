@@ -4,29 +4,29 @@
 -- 
 -- This script also will create the necessary dataports if they do not exist.
 -- 
--- Dependencies:
---   * temperature, humidity, and ammonia data sources must be present
---   * set_point data source of type string. Format:
---     {"temperature":<value>,"humidity":<value>,"ammonia":<value>}
 
 
 debug('starting')
 
 -- table of dataports to create if not already in existance
 local dstable = {
+  {alias="emulator_timer",name="Emulator Timer",format="integer"},
   {alias="temperature",name="Temperature",format="float"},
   {alias="humidity",name="Humidity",format="float"},
-  {alias="ammonia",name="Ammonia",format="float"},
+  {alias="set_point",name="Set Points",format="string",},
 }
 
+-- This routine checks to see if each item listed in the dstable 
+-- is a dataport under this client, otherwise creates it using 
+-- the manage.create scripting API
+--
 debug('checking and adding data ports')
-
 for i, ds in ipairs(dstable) do
   if not manage.lookup("aliased" ,ds.alias) then
     local description = {
       format = ds.format
      ,name = ds.name
-     ,retention = {count = 1 ,duration = "infinity"}
+     ,retention = {count = "infinity" ,duration = "infinity"}
      ,visibility = "private"
     }
     local success ,rid = manage.create("dataport" ,description)
@@ -40,9 +40,9 @@ for i, ds in ipairs(dstable) do
 end
 
 -- Ok, now get variable aliases for the dataports
+local emulator_timer = alias['emulator_timer']
 local temperature = alias['temperature']
 local humidity    = alias['humidity']
-local ammonia     = alias['ammonia']
 
 -- How often should data be written? WAIT is measured in seconds.
 local WAIT = 10
@@ -73,6 +73,9 @@ end
 -- and the next data value. The constants DMIN/DMAX and UMIN/UMAX are used to constrain
 -- the amount of variability in the samples.
 local function new(current,target)
+    if current == nil then
+        current = target
+    end
     if current < target then
         return current + rand(UMIN, UMAX)
     else
@@ -92,48 +95,21 @@ local function f2c(f)
     return (f - 32) * 5/9  
 end
 
+-- Initial local variables with values that are sensible defaults. 
+local t_set = 20 -- 20 degrees C (room temp)
+local h_set = 50 -- 50% relative humidity
+
 -- Now that the script has been initialized, enter the forever busy-wait loop
 while true do
   
-    -- This is somewhat of a hack, but we'll wait on either the temperature value
-    -- to change or the wait period to expire. Since this script is the only thing
-    -- that is updating the temperature datasource, it's safe to do it this way.
-    local ts1 = temperature.wait(now+WAIT)
+    -- Use a unused dataport to wait on, which will timeout at now+WAIT seconds and then run
+    local ts1 = emulator_timer.wait(now+WAIT)
 
-    -- Initial local variables with values that are sensible defaults. These are
-    -- only used if the value in the set_points data source is missing or corrupt.  
-    local t_set = 20 -- 20 degrees C (room temp)
-    local h_set = 50 -- 50% relative humidity
-    local a_set = 0  -- 0 ppm ammonia present
-
-    -- Read the set_points data source, which is assumed to be of the following
-    -- format: {"temperature":<value>,"humidity":<value>,"ammonia":<value>}
-    local set_points  = alias['set_points']
-    local d = json.decode(set_points.value)
-
-    -- If the value in the set_points datasource was valid, then update the local
-    -- set point variables with the values specified. If the values in the set_points
-    -- data source are invalid, the defaults for t_set, h_set, and a_set will be used.    
-    if d then
-        if d.temperature then
-            t_set = d.temperature
-        end
-        if d.humidity then
-            h_set = d.humidity
-        end
-        if d.ammonia then
-            a_set = d.ammonia
-        end
-    end
-
-    -- Set the temperature, humidity, and ammonia data sources with new values
+    -- Set the temperature, and humidity data sources with new values
     -- that are randomized, yet moving towards defined set points.
     --
-    -- Note that the temperature data source uses the f2c function to convert
-    -- Fahrenheit to Celsius prior to generating the next data point. 
-    temperature.value = new(f2c(temperature.value), t_set)
+    temperature.value = new(temperature.value, t_set)
     humidity.value = new(humidity.value, h_set)
-    ammonia.value = new(ammonia.value, a_set)
   
-    debug("Updated values: " .. temperature.value .. ", " .. humidity.value .. ", " .. ammonia.value)
+    debug("Updated values: " .. temperature.value .. ", " .. humidity.value)
 end
