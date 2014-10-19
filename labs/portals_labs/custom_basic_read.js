@@ -1,7 +1,17 @@
 function(container, portal) {
   var html = '';
+  var dataport_name = '';
 
   console.log(portal);
+  if (portal.clients.length == 0){
+    html = '<div style="padding:20px 20px">';
+    html += '<h2>Please select a Client Data from Widget Options</h2>';
+    html += '</div>';
+    $(container).html(html);
+    return;
+  }
+
+  dataport_name = portal.clients[0].dataports[0].info.description.name;
 
   function reload() {
     // call the read widget API
@@ -32,7 +42,8 @@ function(container, portal) {
   }
 
   html = '<div style="padding:20px 20px">';
-  html += '<h2>Latest Temperature Value:</h2> <div id="temperature" style="font-size:48px; height:1.5em;line-height:1.5em;"> </div>';
+  html += '<h2>Latest '+dataport_name+ ' Value:</h2>';
+  html += '<div id="temperature" style="font-size:48px; height:1.5em;line-height:1.5em;"> </div>';
   html += '<div id="time" style="font-size:smaller"> </div>';
   html += '<div id="status" style="font-size:small;padding:2px 0px;height:1.5em">loading...</div>';
   html += '<div><a class="reload" href="javascript:void(0);">manual reload</a></div>';
