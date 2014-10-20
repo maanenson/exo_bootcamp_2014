@@ -38,7 +38,7 @@ if not success then
 end
 
 -- send a nice email report to yourself for your client information:
-local emailaddress = 'mikeaanenson@exosite.com'
+local emailaddress = '<YOUREMAILADDRESSHERE>'
 local subject = 'My Device Information'
 local report = 'Report\n\n'
 
