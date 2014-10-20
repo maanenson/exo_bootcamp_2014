@@ -17,7 +17,7 @@ function(container, portal) {
     // call the read widget API
     var options = {
       starttime: 1,                          // beginning of epoch
-      endtime: (new Date).getTime() / 1000,  // current time
+      //endtime: (new Date).getTime() / 1000,  // default is 'now'
       limit: 1,                              // single point
       sort: "desc"                           // latest point
     };
