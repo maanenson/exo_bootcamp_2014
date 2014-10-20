@@ -110,7 +110,7 @@ print(coap.humanFormatMessage(recv_msg))
 print '--REQUEST / RESPONSE SIZE:----------------------'
 print 'Request:'+ str(len(binascii.b2a_hex(msg.encode()))/2)+ ' Bytes'
 print 'Response:'+ str(len(binascii.b2a_hex(data))/2)+ ' Bytes'
-print 'Total:' + str(len(binascii.b2a_hex(msg.encode()))/2+len(len(binascii.b2a_hex(data))/2)) + ' Bytes'
+print 'Total:' + str(len(binascii.b2a_hex(msg.encode()))/2 + len(binascii.b2a_hex(data))/2) + ' Bytes'
 print '---------------------------------'
 print '\r\n\r\n'
 
