@@ -19,10 +19,6 @@ from httplib import HTTPResponse
 from StringIO import StringIO
 
 
-from pyonep import onep #Exosite Library
-o = onep.OnepV1(httptimeout=5)
-
-
 SHOW_HTTP_REQUESTS = False
 
 # -----------------------------------------------------------------
