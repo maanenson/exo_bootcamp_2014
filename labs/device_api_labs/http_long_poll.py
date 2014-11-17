@@ -19,10 +19,10 @@ print '=================='
 # Note: This example is building a large string to send over the socket, this could be done
 # instead line by line.  For purposes of printing out the request, it is done this way.
 request_packet = ''
-request_packet += 'GET /api:v1/stack/waitalias?output HTTP/1.1\r\n'
+request_packet += 'GET /onep:v1/stack/alias?output HTTP/1.1\r\n'
 request_packet += 'Host: m2.exosite.com\r\n'
 request_packet += 'X-Exosite-CIK: '+cik+'\r\n'
-request_packet += 'Request-Timeout : 60000\r\n' #This specifies a wait in milliseconds 
+request_packet += 'Request-Timeout: 60000\r\n' #This specifies a wait in milliseconds 
 #request_packet += 'If-Modified-Since : 1413667824\r\n' #Default is the sever's now (current time)
 request_packet += 'Accept: application/x-www-form-urlencoded; charset=utf-8\r\n'
 request_packet += '\r\n' # Must have blank line
